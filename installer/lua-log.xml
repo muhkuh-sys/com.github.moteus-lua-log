@@ -12,11 +12,7 @@
 		</description>
 	</info>
 	<dependencies>
-		<dependency group="com.github.hoelzro" module="lua-term" artifact="lua5.3-lua-term" version="0.7"/>
-		<dependency group="com.github.tieske" module="date" artifact="date" version="2.1"/>
-	</dependencies>
-	<dependencies>
-		<dependency group="com.github.hoelzro" module="lua-term" artifact="lua5.2-lua-term" version="0.7"/>
+		<dependency group="com.github.hoelzro" module="lua-term" artifact="lua5.4-lua-term" version="0.7"/>
 		<dependency group="com.github.tieske" module="date" artifact="date" version="2.1"/>
 	</dependencies>
 	<dependencies>
