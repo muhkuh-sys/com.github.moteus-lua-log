@@ -95,7 +95,8 @@ tArcList.AddFiles('lua/log/formatter/',
 tArcList.AddFiles('lua/log/logformat/',
                   os.path.join(strDepackPath, 'lua/log/logformat/default.lua'),
                   os.path.join(strDepackPath, 'lua/log/logformat/proxy.lua'),
-                  os.path.join(strDepackPath, 'lua/log/logformat/syslog.lua'))
+                  os.path.join(strDepackPath, 'lua/log/logformat/syslog.lua'),
+                  os.path.join(strDepackPath, 'lua/log/logformat/us_precision.lua'))
 
 tArcList.AddFiles('lua/log/logformat/proxy/',
                   os.path.join(strDepackPath, 'lua/log/logformat/proxy/pack.lua'))
