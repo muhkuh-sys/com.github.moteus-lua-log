@@ -28,8 +28,17 @@
 SConscript('mbs/SConscript')
 Import('atEnv')
 
-import os.path
+import glob
+import os
+import subprocess
 import tarfile
+
+
+#----------------------------------------------------------------------------
+#
+# Remove any old depack folder.
+#
+subprocess.check_call(['rm', '-rf', 'targets/depack'])
 
 
 #----------------------------------------------------------------------------
@@ -40,6 +49,17 @@ tSrcArchive = tarfile.open('lua-log-0.1.6.tar.gz', 'r')
 tSrcArchive.extractall('targets/depack')
 tSrcArchive.close()
 strDepackPath = 'targets/depack/lua-log-0.1.6/'
+
+
+#----------------------------------------------------------------------------
+#
+# Apply all patches.
+#
+for strPatch in glob.iglob(os.path.join('patches', '*.diff')):
+    tPatch = open(strPatch, 'rt')
+    tProc = subprocess.Popen(['patch', '-p1'], stdin=tPatch, cwd=strDepackPath)
+    tProc.wait()
+    tPatch.close()
 
 #----------------------------------------------------------------------------
 #

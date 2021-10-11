@@ -1,0 +1,80 @@
+diff -uNr lua-log-0.1.6/lua/log/logformat/us_precision.lua lua-log-0.1.6_patched/lua/log/logformat/us_precision.lua
+--- lua-log-0.1.6/lua/log/logformat/us_precision.lua	1970-01-01 01:00:00.000000000 +0100
++++ lua-log-0.1.6_patched/lua/log/logformat/us_precision.lua	2021-10-11 11:49:45.795645444 +0200
+@@ -0,0 +1,22 @@
++local string = require "string"
++local Log    = require "log"
++local socket = require "socket"
++local date   = require "date"
++
++local sformat = string.format
++local ticksPerSecond = date(1,1,1,0,0,1,0):spanticks()
++local function date_fmt(now)
++  local Y, M, D = now:getdate()
++  local h,m,s,t = now:gettime()
++  return sformat("%.4d-%.2d-%.2d %.2d:%.2d:%09.6f", Y, M, D, h, m, s + t/ticksPerSecond)
++end
++
++local M = {}
++
++function M.new()
++  return function (msg, lvl, now)
++    return date_fmt(now) .. ' [' .. Log.LVL_NAMES[lvl] .. '] ' .. msg
++  end
++end
++
++return M
+diff -uNr lua-log-0.1.6/lua/log.lua lua-log-0.1.6_patched/lua/log.lua
+--- lua-log-0.1.6/lua/log.lua	2016-09-15 15:34:27.000000000 +0200
++++ lua-log-0.1.6_patched/lua/log.lua	2021-10-11 11:50:56.023366695 +0200
+@@ -65,6 +65,8 @@
+ 
+   max_lvl = assert(lvl2number ( max_lvl or LOG_LVL.INFO ) )
+ 
++  local fHasSocket, socket = pcall(require, 'socket')
++
+   if not writer then
+     writer = require"log.writer.stdout".new()
+   end
+@@ -74,17 +76,32 @@
+   end
+ 
+   if not logformat then
+-    logformat = require"log.logformat.default".new()
++    if fHasSocket==true then
++      logformat = require"log.logformat.us_precision".new()
++    else
++      logformat = require"log.logformat.default".new()
++    end
+   end
+ 
+-  local write = function (lvl, ... )
+-    local now = date()
+-    writer( logformat, formatter(...), lvl, now )
+-  end;
+-
+-  local dump  = function(lvl, fn, ...)
+-    local now = date()
+-    writer( logformat, (fn(...) or ''), lvl, now )
++  local write, dump
++  if fHasSocket==true then
++    write = function (lvl, ... )
++      local now = date(socket.gettime())
++      writer( logformat, formatter(...), lvl, now )
++    end
++    dump  = function(lvl, fn, ...)
++      local now = date(socket.gettime())
++      writer( logformat, (fn(...) or ''), lvl, now )
++    end
++  else
++    write = function (lvl, ... )
++      local now = date()
++      writer( logformat, formatter(...), lvl, now )
++    end
++    dump  = function(lvl, fn, ...)
++      local now = date()
++      writer( logformat, (fn(...) or ''), lvl, now )
++    end
+   end
+ 
+   local logger = {}
